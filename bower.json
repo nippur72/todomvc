@@ -3,8 +3,11 @@
 	"version": "0.0.1",
 	"dependencies": {
 		"todomvc-common": "~0.1.4",
-		"core-selector": "Polymer/core-selector",
-		"flatiron-director": "Polymer/flatiron-director",
-		"core-localstorage": "Polymer/core-localstorage"
+		"polymer": "Polymer/polymer",
+		"flatiron-director": "nippur72/flatiron-director",
+		"iron-localstorage": "PolymerElements/iron-localstorage",
+		"iron-selector": "PolymerElements/iron-selector",
+		"iron-a11y-keys": "PolymerElements/iron-a11y-keys",
+		"iron-input": "PolymerElements/iron-input"
 	}
 }

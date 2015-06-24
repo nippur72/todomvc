@@ -1,0 +1,16 @@
+{
+	"name": "todomvc-polymer",
+	"version": "1.0.0",
+	"description": "TodoMVC with Polymer >1.0",
+	"main": "index.js",
+	"scripts": {
+		"start": "gulp serve"
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"babel": "^5.6.3",
+		"browser-sync": "^2.7.12",
+		"gulp": "^3.9.0",
+	}
+}
