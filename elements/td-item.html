@@ -1,56 +1,102 @@
 <!--
-    @license
-    Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
-    This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-    The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-    The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-    Code distributed by Google as part of the polymer project is also
-    subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+		@license
+		Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
+		This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+		The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+		The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+		Code distributed by Google as part of the polymer project is also
+		subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 <link rel="import" href="../components/polymer/polymer.html">
-<link rel="import" href="td-input.html">
 
-<polymer-element name="td-item" extends="li" attributes="item editing" on-blur="{{commitAction}}">
+<dom-module id="td-item" name="">
 	<template>
 		<link rel="stylesheet" href="td-item.css">
-		<div class="view {{ {completed: item.completed, editing: editing} | tokenList }}" hidden?="{{editing}}" on-dblclick="{{editAction}}">
-			<input type="checkbox" class="toggle" checked="{{item.completed}}" on-click="{{itemChangeAction}}">
+
+		<div class$="{{computeClass(item)}}" hidden$="{{editing}}" on-dblclick="editAction">
+			<input type="checkbox" class="toggle" checked="{{item.completed}}" on-click="itemChangeAction">
 			<label>{{item.title}}</label>
-			<button class="destroy" on-click="{{destroyAction}}"></button>
+			<button class="destroy" on-click="destroyAction"></button>
 		</div>
-		<input is="td-input" id="edit" class="edit" value="{{item.title}}" hidden?="{{!editing}}" on-td-input-commit="{{commitAction}}" on-td-input-cancel="{{cancelAction}}">
+		<input is="iron-input" id="edit" class="edit" value$="{{item.title}}" hidden$="{{!editing}}" on-blur="commitAction">
+
+		<iron-a11y-keys keys="enter esc" on-keys-pressed="inputEditKeyPressed"></iron-a11y-keys>
 	</template>
+
 	<script>
-		(function() {
-			Polymer('td-item', {
-				editing: false,
-				editAction: function() {
-					this.editing = true;
-					// schedule focus for the end of microtask, when the input will be visible
-					this.asyncMethod(function() {
-						this.$.edit.focus();
-					});
-				},
-				commitAction: function() {
-					if (this.editing) {
-						this.editing = false;
-						this.item.title = this.item.title.trim();
-						if (this.item.title === '') {
-							this.destroyAction();
-						}
-						this.fire('td-item-changed');
+		Polymer({
+			is: 'td-item',
+
+			extends: 'li',
+
+			properties: {
+				item: {
+					type: Object,
+					value: {
+						title: '',
+						completed: false
 					}
 				},
-				cancelAction: function() {
+				editing: {
+					type: Boolean,
+					value: false
+				},
+				inputKeysPressedTarget:	Object
+			},
+
+			ready: function() {
+				this.set('item.title', this.name);
+			},
+
+			attached: function() {
+				this.inputKeysPressedTarget = document.querySelector('.edit');
+			},
+
+			editAction: function() {
+				this.editing = true;
+				this.async(function() {
+					this.$.edit.focus();
+				});
+			},
+
+			commitAction: function() {
+				if (this.editing) {
 					this.editing = false;
-				},
-				itemChangeAction: function() {
+					this.set('item.title', this.$.edit.value.trim());
+					if (this.item.title === '') {
+						this.destroyAction();
+					}
 					this.fire('td-item-changed');
-				},
-				destroyAction: function() {
-					this.fire('td-destroy-item', this.item);
 				}
-			});
-		})();
+			},
+
+			itemChangeAction: function() {
+				this.fire('td-item-changed');
+			},
+
+			cancelAction: function() {
+				this.editing = false;
+			},
+
+			destroyAction: function() {
+				this.fire('td-destroy-item', this.item);
+			},
+
+			inputEditKeyPressed: function(e) {
+				switch(e.detail.keyboardEvent.code.toLowerCase()) {
+					case 'escape':
+						this.cancelAction();
+						break;
+					case 'enter':
+						this.commitAction();
+						break;
+				}
+			},
+
+			computeClass: function(item) {
+				return 'view ' + (item.completed === true ? 'completed ' : '') + (this.editing === true ? 'editing ' : '');
+			}
+		});
 	</script>
+</dom-module>
 </polymer-element>
